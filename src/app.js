@@ -50,7 +50,7 @@ setupExceptionHandling()
 
 client.init(navigator.userAgent, navigator.platform)
 
-export const state: {prefix: ?string, prefixWithoutFile: ?string} = (module.hot && module.hot.data)
+export const state: {prefix: ?string, prefixWithoutFile: ?string} = (typeof module != "undefined" && module.hot && module.hot.data)
 	? downcast(module.hot.data.state) : {prefix: null, prefixWithoutFile: null}
 
 // Write it here for the WorkerClient so that it can load relative worker easily. Should do it here so that it doesn't break after HMR.
