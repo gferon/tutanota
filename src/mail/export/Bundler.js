@@ -49,7 +49,7 @@ export function makeMailBundle(mail: Mail, entityClient: EntityClient, worker: W
 		: Promise.resolve(null)
 	const recipientMapper = addr => ({address: addr.address, name: addr.name})
 	return Promise.all([bodyTextPromise, attachmentsPromise, headersPromise])
-	              .spread((bodyText, attachments, headers) => ({
+	              .then(([bodyText, attachments, headers]) => ({
 		              subject: mail.subject,
 		              body: bodyText,
 		              sender: recipientMapper(mail.sender),
