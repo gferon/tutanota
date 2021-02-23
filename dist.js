@@ -370,7 +370,6 @@ async function buildDesktopClient(version) {
 				: "https://mail.tutanota.com/desktop",
 			nameSuffix: "",
 			notarize: !options.customDesktopRelease,
-
 			outDir: options.outDir,
 			unpacked: options.unpacked
 		}
@@ -500,6 +499,7 @@ async function _writeFile(targetFile, content) {
 }
 
 function signDesktopClients() {
+	return
 	if (options.deb) {
 		if (options.stage === "release" || options.stage === "prod") {
 			sign('./build/desktop/tutanota-desktop-mac.zip', 'mac-sig-zip.bin', 'latest-mac.yml')

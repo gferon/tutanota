@@ -45,7 +45,7 @@ function signer(args) {
 		"-pkcs11engine", "/usr/lib/x86_64-linux-gnu/engines-1.1/pkcs11.so",
 		"-pkcs11module", "/usr/lib/x86_64-linux-gnu/opensc-pkcs11.so",
 		"-certs", certificateFile,
-		"-key", "10",
+		"-key", "10", // CHECK: is this the key index in the HSM?
 		"-pass", hsmPin,
 		"-h", args.hash ? args.hash : "sha256",
 		"-t", "http://timestamp.comodoca.com",
@@ -62,9 +62,9 @@ function signer(args) {
 	})
 
 	return Promise.fromCallback(cb => {
-		child.on('close', (e) => {
-			if (e !== 0) {
-				cb(e)
+		child.on('close', (exitCode) => {
+			if (exitCode !== 0) {
+				cb(exitCode)
 			} else {
 				fs.removeSync(unsignedFileName)
 				cb(null, args.path)
