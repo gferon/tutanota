@@ -2,20 +2,6 @@
 import {size} from "../../gui/size"
 import m from "mithril"
 import stream from "mithril/stream/stream.js"
-import {ExpanderButton, ExpanderPanel} from "../gui/base/Expander"
-import {ExpanderButtonN, ExpanderPanelN} from "../gui/base/ExpanderN"
-import {serviceRequestVoid} from "../api/main/Entity"
-import {Button, createAsyncDropDownButton, createDropDownButton} from "../gui/base/Button"
-import type {BannerAttrs} from "../gui/base/Banner"
-import {formatDateTime, formatDateWithWeekday, formatStorageSize, formatTime, urlEncodeHtmlTags} from "../misc/Formatter"
-import {windowFacade} from "../misc/WindowFacade"
-import {ease} from "../gui/animation/Easing"
-import type {DomMutation} from "../gui/animation/Animations"
-import {animations, scroll} from "../gui/animation/Animations"
-import {nativeApp} from "../native/NativeWrapper"
-import type {MailBody} from "../api/entities/tutanota/MailBody"
-import {MailBodyTypeRef} from "../api/entities/tutanota/MailBody"
-import type {CalendarMethodEnum, InboxRuleTypeEnum, MailReportTypeEnum} from "../api/common/TutanotaConstants"
 import {ExpanderButtonN, ExpanderPanelN} from "../../gui/base/Expander"
 import {serviceRequestVoid} from "../../api/main/Entity"
 import {Button} from "../../gui/base/Button"
@@ -116,19 +102,6 @@ import {_TypeModel as MailTypeModel} from "../../api/entities/tutanota/Mail"
 import {copyToClipboard} from "../../misc/ClipboardUtils"
 import type {GroupInfo} from "../../api/entities/sys/GroupInfo"
 import {EventBanner} from "./EventBanner"
-import {checkApprovalStatus} from "../misc/LoginUtils"
-import {getEventFromFile} from "../calendar/CalendarInvites"
-import type {CalendarEvent} from "../api/entities/tutanota/CalendarEvent"
-import {newMailEditorAsResponse, newMailEditorFromDraft, newMailtoUrlMailEditor} from "./MailEditor"
-import type {MailboxDetail} from "./MailModel"
-import type {ResponseMailParameters} from "./SendMailModel"
-import {defaultSendMailModel} from "./SendMailModel"
-import {UserError} from "../api/common/error/UserError"
-import {showUserError} from "../misc/ErrorHandlerImpl"
-import {EntityClient} from "../api/common/EntityClient"
-import {MailModel} from "./MailModel"
-import type {InfoBannerAttrs} from "../gui/base/InfoBanner"
-import {InfoBanner} from "../gui/base/InfoBanner"
 import {checkApprovalStatus} from "../../misc/LoginUtils"
 import type {CalendarEvent} from "../../api/entities/tutanota/CalendarEvent"
 import type {MailboxDetail, MailModel} from "../model/MailModel"
@@ -141,6 +114,10 @@ import type {ContactModel} from "../../contacts/model/ContactModel"
 import {elementIdPart, getListId, listIdPart} from "../../api/common/utils/EntityUtils"
 import {isNewMailActionAvailable} from "../../gui/nav/NavFunctions"
 import {stringifyFragment} from "../../gui/HtmlUtils"
+import {InfoBanner} from "../../gui/base/InfoBanner"
+import type {InfoBannerAttrs} from "../../gui/base/InfoBanner"
+import {urlify} from "../../misc/Urlifier"
+import {htmlSanitizer} from "../../misc/HtmlSanitizer"
 
 assertMainOrNode()
 
@@ -846,7 +823,7 @@ export class MailViewer {
 	}
 
 	_createLoadExternalContentButton(mail: Mail, colors: ButtonColorEnum): Children {
-		return this._contentBlocked
+		return this._contentBlockingStatus === ContentBlockingStatus.Block
 			? m(ButtonN, {
 				label: "contentBlocked_msg",
 				icon: () => Icons.Picture,
@@ -858,7 +835,7 @@ export class MailViewer {
 								Promise.all([import("../../misc/Urlifier"), import("../../misc/HtmlSanitizer")])
 								       .then(([{urlify}, {htmlSanitizer}]) => {
 									       this._htmlBody = urlify(stringifyFragment(htmlSanitizer.sanitizeFragment(this._getMailBody(), false, isTutanotaTeamMail(mail)).html))
-									       this._contentBlocked = false
+									       this._contentBlockingStatus = ContentBlockingStatus.Show
 									       this._domBodyDeferred = defer()
 									       this._replaceInlineImages()
 									       m.redraw()

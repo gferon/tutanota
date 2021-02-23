@@ -6,16 +6,7 @@ import {EntityEventBatchTypeRef} from "../../entities/sys/EntityEventBatch"
 import type {DbKey, DbTransaction} from "./DbFacade"
 import {DbFacade, ExternalAllowListOS, GroupDataOS, MetaDataOS} from "./DbFacade"
 import {
-	firstBiggerThanSecond,
-	GENERATED_MAX_ID,
-	getElementId,
-	isSameId,
-	isSameTypeRef,
-	isSameTypeRefByAttr,
-	TypeRef
 } from "../../common/EntityFunctions"
-import type {DbTransaction} from "./DbFacade"
-import {DbFacade, GroupDataOS, MetaDataOS} from "./DbFacade"
 import type {DeferredObject} from "../../common/utils/Utils"
 import {defer, downcast, neverNull, noOp} from "../../common/utils/Utils"
 import {hash} from "../crypto/Sha256"
