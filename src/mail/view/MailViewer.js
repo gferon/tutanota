@@ -93,7 +93,6 @@ import {navButtonRoutes} from "../../misc/RouteChange"
 import {createEmailSenderListElement} from "../../api/entities/sys/EmailSenderListElement"
 import {RecipientButton} from "../../gui/base/RecipientButton"
 import {Banner, BannerType} from "../../gui/base/Banner"
-import {createReportPhishingPostData} from "../../api/entities/tutanota/ReportPhishingPostData"
 import {base64ToUint8Array} from "../../api/common/utils/Encoding"
 import type {Mail} from "../../api/entities/tutanota/Mail"
 import {_TypeModel as MailTypeModel} from "../../api/entities/tutanota/Mail"
@@ -116,6 +115,7 @@ import {htmlSanitizer} from "../../misc/HtmlSanitizer"
 import {locator} from "../../api/main/MainLocator"
 import {makeMailBundle} from "../export/Bundler"
 import {exportMailsInZip} from "../export/Exporter"
+import {createReportMailPostData} from "../../api/entities/tutanota/ReportMailPostData"
 
 assertMainOrNode()
 
@@ -681,12 +681,12 @@ export class MailViewer {
 		const sendReport = (reportType: MailReportTypeEnum) => {
 			worker.resolveSessionKey(MailTypeModel, this.mail)
 			      .then((mailSessionKeyB64) => {
-				      const postData = createReportPhishingPostData({
+				      const postData = createReportMailPostData({
 					      mailId: this.mail._id,
 					      mailSessionKey: base64ToUint8Array(neverNull(mailSessionKeyB64)),
 					      reportType,
 				      })
-				      return serviceRequestVoid(TutanotaService.ReportPhishingService, HttpMethod.POST, postData)
+				      return serviceRequestVoid(TutanotaService.ReportMailService, HttpMethod.POST, postData)
 			      })
 			      .then(() => {
 				      if (reportType === MailReportType.PHISHING) {
