@@ -48,7 +48,7 @@ export class EventPreviewView implements MComponent<Attrs> {
 					? m(".flex.pb-s.items-start", [
 						renderSectionIndicator(Icons.AlignLeft, {marginTop: "2px"}),
 						limitDescriptionHeight
-							? m(".scroll-webkit-scrollbar.full-width", {style: {maxHeight: "100px"}}, m.trust(sanitizedDescription))
+							? m(".scroll.visible-scrollbar.full-width", {style: {maxHeight: "100px"}}, m.trust(sanitizedDescription))
 							: m("", m.trust(sanitizedDescription))
 					])
 					: null,
