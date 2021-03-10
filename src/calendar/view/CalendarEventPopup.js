@@ -17,12 +17,14 @@ import {DROPDOWN_MARGIN, showDropdown} from "../../gui/base/DropdownN"
 import {Keys} from "../../api/common/TutanotaConstants"
 
 export class CalendarEventPopup implements ModalComponent {
-	_calendarEvent: CalendarEvent;
-	_rect: ClientRect;
-	_viewModel: CalendarEventViewModel;
-	_onEditEvent: () => mixed;
+	_calendarEvent: CalendarEvent
+	_rect: ClientRect
+	_viewModel: CalendarEventViewModel
+	_onEditEvent: () => mixed
 	_shortcuts: Shortcut[]
-	_sanitizedDescription: string;
+	_sanitizedDescription: string
+
+	view: Vnode<any> => Children
 
 	constructor(viewModel: CalendarEventViewModel, calendarEvent: CalendarEvent, calendars: Map<Id, CalendarInfo>,
 	            mailboxDetail: MailboxDetail, rect: ClientRect,
@@ -76,63 +78,63 @@ export class CalendarEventPopup implements ModalComponent {
 					help: "delete_action"
 				})
 		}
+		
+		this.view = (vnode: Vnode<any>) => {
+			return m(".abs.elevated-bg.plr.border-radius.dropdown-shadow", {
+					style: {
+						width: px(Math.min(window.innerWidth - DROPDOWN_MARGIN * 2, 400)), // minus margin, need to apply it now to not overflow later
+						opacity: "0", // see hack description below
+						margin: "1px" // because calendar event bubles have 1px border, we want to align
+					},
+					oncreate: ({dom}) => {
+						// This is a hack to get "natural" view size but render it without apacity first and then show dropdown with inferred
+						// size.
+						setTimeout(() => showDropdown(this._rect, dom, dom.offsetHeight, 400), 24)
+					},
+				},
+				[
+					m(".flex.flex-end", [
+						m(ButtonN, {
+							label: "edit_action",
+							click: () => {
+								this._onEditEvent()
+								this._close()
+							},
+							type: ButtonType.ActionLarge,
+							icon: () => Icons.Edit,
+							colors: ButtonColors.DrawerNav,
+						}),
+						!this._viewModel.isReadOnlyEvent()
+							? m(ButtonN, {
+								label: "delete_action",
+								click: () => deleteEvent(this._viewModel).then((confirmed) => {
+									if (confirmed) this._close()
+								}),
+								type: ButtonType.ActionLarge,
+								icon: () => Icons.Trash,
+								colors: ButtonColors.DrawerNav,
+							})
+							: null,
+						m(ButtonN, {
+							label: "close_alt",
+							click: () => this._close(),
+							type: ButtonType.ActionLarge,
+							icon: () => Icons.Cancel,
+							colors: ButtonColors.DrawerNav,
+						}),
+					]),
+					m(EventPreviewView, {
+						event: this._calendarEvent,
+						limitDescriptionHeight: true,
+						sanitizedDescription: this._sanitizedDescription
+					}),
+				],
+			)
+		}
 	}
 
 	show() {
 		modal.displayUnique(this, false)
-	}
-
-	view(vnode: Vnode<any>): Children {
-		return m(".abs.elevated-bg.plr.border-radius.dropdown-shadow", {
-				style: {
-					width: px(Math.min(window.innerWidth - DROPDOWN_MARGIN * 2, 400)), // minus margin, need to apply it now to not overflow later
-					opacity: "0", // see hack description below
-					margin: "1px" // because calendar event bubles have 1px border, we want to align
-				},
-				oncreate: ({dom}) => {
-					// This is a hack to get "natural" view size but render it without apacity first and then show dropdown with inferred
-					// size.
-					setTimeout(() => showDropdown(this._rect, dom, dom.offsetHeight, 400), 24)
-				},
-			},
-			[
-				m(".flex.flex-end", [
-					m(ButtonN, {
-						label: "edit_action",
-						click: () => {
-							this._onEditEvent()
-							this._close()
-						},
-						type: ButtonType.ActionLarge,
-						icon: () => Icons.Edit,
-						colors: ButtonColors.DrawerNav,
-					}),
-					!this._viewModel.isReadOnlyEvent()
-						? m(ButtonN, {
-							label: "delete_action",
-							click: () => deleteEvent(this._viewModel).then((confirmed) => {
-								if (confirmed) this._close()
-							}),
-							type: ButtonType.ActionLarge,
-							icon: () => Icons.Trash,
-							colors: ButtonColors.DrawerNav,
-						})
-						: null,
-					m(ButtonN, {
-						label: "close_alt",
-						click: () => this._close(),
-						type: ButtonType.ActionLarge,
-						icon: () => Icons.Cancel,
-						colors: ButtonColors.DrawerNav,
-					}),
-				]),
-				m(EventPreviewView, {
-					event: this._calendarEvent,
-					limitDescriptionHeight: true,
-					sanitizedDescription: this._sanitizedDescription
-				}),
-			],
-		)
 	}
 
 	_close() {
