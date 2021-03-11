@@ -53,6 +53,7 @@ import type {ContactFormAccountReturn} from "../../entities/tutanota/ContactForm
 import type {SystemKeysReturn} from "../../entities/sys/SystemKeysReturn"
 import type {PaymentDataServicePutReturn} from "../../entities/sys/PaymentDataServicePutReturn"
 import {LockedError} from "../../common/error/RestError"
+import {random} from "../crypto/Randomizer"
 
 assertWorkerOrNode()
 
@@ -73,9 +74,10 @@ export class CustomerFacade {
 		this._counters = counters
 	}
 
-	getDomainValidationRecord(): Promise<string> {
+	getDomainValidationRecord(domainName: string): Promise<string> {
 		return Promise.resolve("t-verify="
-			+ uint8ArrayToHex(hash(stringToUtf8Uint8Array(neverNull(this._login.getLoggedInUser().customer))).slice(0, 16)))
+			+ uint8ArrayToHex(hash(stringToUtf8Uint8Array(domainName.trim().toLowerCase()
+				+ neverNull(this._login.getLoggedInUser().customer))).slice(0, 16)))
 	}
 
 	addDomain(domainName: string): Promise<CustomDomainReturn> {
