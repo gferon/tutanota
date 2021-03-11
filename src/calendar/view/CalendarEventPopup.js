@@ -78,16 +78,16 @@ export class CalendarEventPopup implements ModalComponent {
 					help: "delete_action"
 				})
 		}
-		
+
 		this.view = (vnode: Vnode<any>) => {
 			return m(".abs.elevated-bg.plr.border-radius.dropdown-shadow", {
 					style: {
 						width: px(Math.min(window.innerWidth - DROPDOWN_MARGIN * 2, 400)), // minus margin, need to apply it now to not overflow later
 						opacity: "0", // see hack description below
-						margin: "1px" // because calendar event bubles have 1px border, we want to align
+						margin: "1px" // because calendar event bubbles have 1px border, we want to align
 					},
 					oncreate: ({dom}) => {
-						// This is a hack to get "natural" view size but render it without apacity first and then show dropdown with inferred
+						// This is a hack to get "natural" view size but render it without opacity first and then show dropdown with inferred
 						// size.
 						setTimeout(() => showDropdown(this._rect, dom, dom.offsetHeight, 400), 24)
 					},
